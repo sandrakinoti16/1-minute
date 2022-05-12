@@ -1,16 +1,16 @@
 from flask import render_template, redirect, url_for,abort,request
 from . import main
 from flask_login import login_required,current_user
-from ..models import User,Pitch,Comment,Upvote,Downvote
+from ..models import Users,Pitches,Comment,Upvote,Downvote
 from .form import UpdateProfile,PitchForm,CommentForm
 from .. import db,photos
 
 @main.route('/')
 def index():
-    pitches = Pitch.query.all()
-    job = Pitch.query.filter_by(category = 'Job').all() 
-    event = Pitch.query.filter_by(category = 'Events').all()
-    advertisement = Pitch.query.filter_by(category = 'Advertisement').all()
+    pitches = Pitches.query.all()
+    job = Pitches.query.filter_by(category = 'Job').all()
+    event = Pitches.query.filter_by(category = 'Events').all()
+    advertisement = Pitches.query.filter_by(category = 'Advertisement').all()
     return render_template('index.html', job = job,event = event, pitches = pitches,advertisement= advertisement)
 
 @main.route('/create_new', methods = ['POST','GET'])
@@ -21,8 +21,8 @@ def new_pitch():
         title = form.title.data
         post = form.post.data
         category = form.category.data
-        user_id = current_user
-        new_pitch_object = Pitch(post=post,user_id=current_user._get_current_object().id,category=category,title=title)
+        user_id = current_user._get_current_object().id
+        new_pitch_object = Pitches(post=post,user_id=user_id,category=category,title=title)
         new_pitch_object.save_p()
         return redirect(url_for('main.index'))
         
@@ -32,7 +32,7 @@ def new_pitch():
 @login_required
 def comment(pitch_id):
     form = CommentForm()
-    pitch = Pitch.query.get(pitch_id)
+    pitch = Pitches.query.get(pitch_id)
     all_comments = Comment.query.filter_by(pitch_id = pitch_id).all()
     if form.validate_on_submit():
         comment = form.comment.data 
@@ -46,9 +46,9 @@ def comment(pitch_id):
 
 @main.route('/user/<name>')
 def profile(name):
-    user = User.query.filter_by(username = name).first()
+    user = Users.query.filter_by(username = name).first()
     user_id = current_user._get_current_object().id
-    posts = Pitch.query.filter_by(user_id = user_id).all()
+    posts = Pitches.query.filter_by(user_id = user_id).all()
     if user is None:
         abort(404)
 
@@ -58,7 +58,7 @@ def profile(name):
 @login_required
 def updateprofile(name):
     form = UpdateProfile()
-    user = User.query.filter_by(username = name).first()
+    user = Users.query.filter_by(username = name).first()
     if user == None:
         abort(404)
     if form.validate_on_submit():
@@ -71,7 +71,7 @@ def updateprofile(name):
 @main.route('/user/<name>/update/pic',methods= ['POST'])
 @login_required
 def update_pic(name):
-    user = User.query.filter_by(username = name).first()
+    user = Users.query.filter_by(username = name).first()
     if 'photo' in request.files:
         filename = photos.save(request.files['photo'])
         path = f'photos/{filename}'

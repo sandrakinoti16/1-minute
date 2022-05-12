@@ -24,6 +24,11 @@ migrate = Migrate()
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config_options[config_name])
+
+    app.config.from_object(['SECRET_KEY'])
+    app.config.from_object(['MAIL_USERNAME'])
+    app.config.from_object(['MAIL_PASSWORD'])
+
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= True
 
     from .auth import auth as authentication_blueprint

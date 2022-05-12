@@ -5,6 +5,7 @@
 {{super()}}
 <link rel="stylesheet" href="{{url_for('static',filename='css/particle.css')}}">
 {% endblock %}
+
 <div class="container"> 
     <div class="row" id="particle-js">
       <div class= "col-md-3"></div>
@@ -19,7 +20,7 @@
       {{wtf.quick_form(loginform)}}
       <p> Don't have an account? <a id="sign" href="{{url_for('auth.signup')}}">Sign up here</a></p>
      </div>
-     <div clas="col-md-3"> </div>
+     <div class="col-md-3"> </div>
     </div>
 </div>
 {% endblock %}
